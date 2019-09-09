@@ -1,5 +1,5 @@
 class TKLMutator extends ROMutator
-	config(TeamKillLogging);
+	config(TKLMutator);
 
 	var config bool LogTeamKills;
 
