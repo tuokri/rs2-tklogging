@@ -1,15 +1,15 @@
 class TKLMutator extends ROMutator
-	config(TKLMutator);
+    config(TKLMutator);
 
-	var config bool LogTeamKills;
+    var config bool LogTeamKills;
 
 function PreBeginPlay()
 {
     LogInternal("TKLogging: PreBeginPlay()");
     if(LogTeamKills)
     {
-    	LogInternal("TKLogging: logging enabled");
-    	ROGameInfo(WorldInfo.Game).PlayerControllerClass = class'TKLPlayerController';
+        LogInternal("TKLogging: logging enabled");
+        ROGameInfo(WorldInfo.Game).PlayerControllerClass = class'TKLPlayerController';
     }
     super(Mutator).PreBeginPlay();
 }
