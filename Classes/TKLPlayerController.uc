@@ -2,12 +2,15 @@ class TKLPlayerController extends ROPlayerController;
 
 function WasTeamKilled(ROPlayerReplicationInfo TeamKiller)
 {
+    local string TeamKillerSteamId64;
+    local string VictimSteamId64;
+
     if(TeamKiller != none)
     {
-        local String TeamKillerSteamId64 = class'OnlineSubsystem'.static.UniqueNetIdToString(TeamKiller.UniqueId);
-        local String VictimSteamId64 = class'OnlineSubsystem'.static.UniqueNetIdToString(PlayerReplicationInfo.UniqueId);
+        TeamKillerSteamId64 = class'OnlineSubsystem'.static.UniqueNetIdToString(TeamKiller.UniqueId);
+        VictimSteamId64 = class'OnlineSubsystem'.static.UniqueNetIdToString(PlayerReplicationInfo.UniqueId);
 
-        Log(((((((("TKLogging: '" $ TeamKiller.PlayerName) $ "' [") $ TeamKillerSteamId64) $ "] teamkilled '")
+        LogInternal(((((((("TKLogging: '" $ TeamKiller.PlayerName) $ "' [") $ TeamKillerSteamId64) $ "] teamkilled '")
             $ PlayerReplicationInfo.PlayerName) $ "' [") $ VictimSteamId64) $ "]");
     }
 
