@@ -9,7 +9,7 @@ function PreBeginPlay()
     if(LogTeamKills)
     {
         `log("logging enabled",, 'TKLogging');
-        ROGameInfo(WorldInfo.Game).PlayerControllerClass = class'TKLPlayerController';
+        ROGameInfo(WorldInfo.Game).GameInfoClass = class'TKLGameInfo';
     }
     super(Mutator).PreBeginPlay();
 }
