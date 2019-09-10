@@ -8,10 +8,10 @@ function WasTeamKilled(ROPlayerReplicationInfo TeamKiller)
 
     if(TeamKiller != none)
     {
-        TeamKillerSteamId64 = class'OnlineSubsystem'.static.UniqueNetIdToString(TeamKiller.UniqueId);
-        VictimSteamId64 = class'OnlineSubsystem'.static.UniqueNetIdToString(PlayerReplicationInfo.UniqueId);
+        TeamKillerSteamId64 = class'ROSteamUtils'.static.UniqueIdToSteamId64(TeamKiller.UniqueId);
+        VictimSteamId64 = class'ROSteamUtils'.static.UniqueIdToSteamId64(PlayerReplicationInfo.UniqueId);
 
-        LogRecord = TimeStamp();
+        LogRecord = "(" $ TimeStamp() $ ")";
         LogRecord $= " '" $ TeamKiller.PlayerName $ "' [" $ TeamKillerSteamId64 $ "]";
         LogRecord $= " teamkilled '" $ PlayerReplicationInfo.PlayerName $ "' [";
         LogRecord $= VictimSteamId64 $ "]";
