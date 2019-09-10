@@ -1,2 +1,2 @@
-`define tklog(timestamp, killer, killedplayer, killerweapon) \
-    class'TKLUtils'.static.TKL_LogIfTeamKill(`timestamp, `killer, `killedplayer, `killerweapon)
+`define tklog(timestamp, killer, killedplayer, cause) \
+    class'TKLUtils'.static.TKL_LogIfTeamKill(`timestamp, `killer, `killedplayer, `cause)

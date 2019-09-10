@@ -1,7 +1,7 @@
 class TKLUtils extends Object;
 
 static function TKL_LogIfTeamKill(String TimeStamp, Controller Killer, 
-	Controller KilledPlayer, String KillerWeapon)
+	Controller KilledPlayer, String Cause)
 {
     local string KillerSteamId64Hex;
     local string KilledPlayerSteamId64Hex;
@@ -24,7 +24,7 @@ static function TKL_LogIfTeamKill(String TimeStamp, Controller Killer,
                 LogRecord $= "' [" $ KillerSteamId64Hex $ "]";
                 LogRecord $= " teamkilled '" $ KilledPlayer.PlayerReplicationInfo.PlayerName;
                 LogRecord $= "' [" $ KilledPlayerSteamId64Hex $ "]";
-                LogRecord $= " with " $ "<" $ KillerWeapon $ ">";
+                LogRecord $= " with " $ "<" $ Cause $ ">";
 
                 `log(LogRecord,, 'TKLogging');
             }

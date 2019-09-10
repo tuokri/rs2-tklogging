@@ -15,19 +15,19 @@ function PreBeginPlay()
 
 function ScoreKill(Controller Killer, Controller KilledPlayer)
 {
-    local string KillerWeapon;
+    local string Cause;
 
     `logd("---------------------- TKLOGGING ----------------------");
 
     if (bLogTeamKills)
     {
-        if (Killer.PlayerReplicationInfo != None)
+        if (Killer != None)
         {
-            // Might not be accurate.
-            KillerWeapon = GetItemName(string(Killer.Pawn.Weapon));
+            Cause = GetItemName(string(
+                ROPawn(KilledPlayer.Pawn).LastTakeHitInfo.DamageType));
         }
 
-        `tklog(TimeStamp(), Killer, KilledPlayer, KillerWeapon);
+        `tklog(TimeStamp(), Killer, KilledPlayer, Cause);
     }
     super.ScoreKill(Killer, KilledPlayer);
 }
