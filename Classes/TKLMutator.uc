@@ -1,15 +1,25 @@
 class TKLMutator extends ROMutator
     config(Game_TKLMutator);
 
-    var config bool LogTeamKills;
+    var config bool bLogTeamKills;
 
 function PreBeginPlay()
 {
     `log("PreBeginPlay()",, 'TKLogging');
-    if(LogTeamKills)
+    if(bLogTeamKills)
     {
         `log("logging enabled",, 'TKLogging');
-        ROGameInfo(WorldInfo.Game).GameInfoClass = class'TKLGameInfo';
     }
-    super(Mutator).PreBeginPlay();
+    super.PreBeginPlay();
+}
+
+function ScoreKill(Controller Killer, Controller KilledPlayer)
+{
+    `log("---------------------- TKLOGGING ----------------------",, 'TKLogging');
+
+    if(bLogTeamKills)
+    {
+        `tklog(TimeStamp(), Killer, KilledPlayer);
+    }
+    super.ScoreKill(Killer, KilledPlayer);
 }

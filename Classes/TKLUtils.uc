@@ -1,6 +1,7 @@
-class TKLGameInfo extends ROGameInfo;
+class TKLUtils extends Object;
 
-function ScoreKill(Controller Killer, Controller KilledPlayer, optional int KillWeaponIndex=-1)
+static function TKL_LogIfTeamKill(String TimeStamp, Controller Killer, 
+	Controller KilledPlayer)
 {
     local string KillerSteamId64Hex;
     local string KilledPlayerSteamId64Hex;
@@ -8,7 +9,8 @@ function ScoreKill(Controller Killer, Controller KilledPlayer, optional int Kill
 
     if (Killer != None && KilledPlayer != None)
     {
-        if (Killer.PlayerReplicationInfo != None && KilledPlayer.PlayerReplicationInfo != None)
+        if (Killer.PlayerReplicationInfo != None 
+        	&& KilledPlayer.PlayerReplicationInfo != None)
         {
             if (Killer.GetTeamNum() == KilledPlayer.GetTeamNum())
             {
@@ -17,17 +19,16 @@ function ScoreKill(Controller Killer, Controller KilledPlayer, optional int Kill
                 KilledPlayerSteamId64Hex = class'OnlineSubsystem'.static.UniqueNetIdToString(
                     KilledPlayer.PlayerReplicationInfo.UniqueId);
 
-                LogRecord = "(" $ TimeStamp() $ ")";
+                LogRecord = "(" $ TimeStamp $ ")";
                 LogRecord $= " '" $ Killer.PlayerReplicationInfo.PlayerName;
                 LogRecord $= "' [" $ KillerSteamId64Hex $ "]";
                 LogRecord $= " teamkilled '" $ KilledPlayer.PlayerReplicationInfo.PlayerName;
                 LogRecord $= "' [" $ KilledPlayerSteamId64Hex $ "]";
-                LogRecord $= " with " $ "<" KillWeaponIndex $ ">";
+
+                // LogRecord $= " with " $ "<" $ KillWeaponIndex $ ">";
 
                 `log(LogRecord,, 'TKLogging');
             }
         }
     }
-
-    super.ScoreKill(Killer, KilledPlayer, KillWeaponIndex);
 }

@@ -1,0 +1,2 @@
+`define tklog(timestamp, killer, killedplayer) \
+    class'TKLUtils'.static.TKL_LogIfTeamKill(`timestamp, `killer, `killedplayer)
