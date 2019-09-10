@@ -6,7 +6,7 @@ class TKLMutator extends ROMutator
 function PreBeginPlay()
 {
     `log("PreBeginPlay()",, 'TKLogging');
-    if(bLogTeamKills)
+    if (bLogTeamKills)
     {
         `log("logging enabled",, 'TKLogging');
     }
@@ -15,11 +15,19 @@ function PreBeginPlay()
 
 function ScoreKill(Controller Killer, Controller KilledPlayer)
 {
-    `log("---------------------- TKLOGGING ----------------------",, 'TKLogging');
+    local string KillerWeapon;
 
-    if(bLogTeamKills)
+    `logd("---------------------- TKLOGGING ----------------------");
+
+    if (bLogTeamKills)
     {
-        `tklog(TimeStamp(), Killer, KilledPlayer);
+        if (Killer.PlayerReplicationInfo != None)
+        {
+            // Might not be accurate.
+            KillerWeapon = GetItemName(string(Killer.Pawn.Weapon));
+        }
+
+        `tklog(TimeStamp(), Killer, KilledPlayer, KillerWeapon);
     }
     super.ScoreKill(Killer, KilledPlayer);
 }
