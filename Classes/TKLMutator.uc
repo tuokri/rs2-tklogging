@@ -5,10 +5,10 @@ class TKLMutator extends ROMutator
 
 function PreBeginPlay()
 {
-    LogInternal("TKLogging: PreBeginPlay()");
+    `log("PreBeginPlay()",, 'TKLogging');
     if(LogTeamKills)
     {
-        LogInternal("TKLogging: logging enabled");
+        `log("logging enabled",, 'TKLogging');
         ROGameInfo(WorldInfo.Game).PlayerControllerClass = class'TKLPlayerController';
     }
     super(Mutator).PreBeginPlay();
