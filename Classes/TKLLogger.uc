@@ -1,8 +1,7 @@
 class TKLLogger extends Object;
 
-var FileWriter Writer;
-
-function LogIfTeamKill(Controller Killer, Controller KilledPlayer)
+static function LogIfTeamKill(Controller Killer, Controller KilledPlayer, 
+	FileWriter Writer, String TimeStamp)
 {
     local String KillerSteamId64Hex;
     local String KilledPlayerSteamId64Hex;
@@ -37,47 +36,15 @@ function LogIfTeamKill(Controller Killer, Controller KilledPlayer)
                 KilledPlayerSteamId64Hex = class'OnlineSubsystem'.static.UniqueNetIdToString(
                     KilledPlayer.PlayerReplicationInfo.UniqueId);
 
-                LogRecord = "(" $ TimeStamp() $ ")";
+                LogRecord = "(" $ TimeStamp $ ")";
                 LogRecord $= " '" $ Killer.PlayerReplicationInfo.PlayerName;
                 LogRecord $= "' [" $ KillerSteamId64Hex $ "]";
                 LogRecord $= " teamkilled '" $ KilledPlayer.PlayerReplicationInfo.PlayerName;
                 LogRecord $= "' [" $ KilledPlayerSteamId64Hex $ "]";
                 LogRecord $= " with " $ "<" $ Cause $ ">";
 
-                if (Writer != None)
-                {
-                	Writer.Logf(LogRecord);
-                }
-                else
-                {
-                	`log("TKLMutator_ERROR: Attempted logging on NULL FileWriter!");
-                }
+                Writer.Logf(LogRecord);
             }
         }
     }
-}
-
-function Initialize(String FileName, FileWriter TKLWriter)
-{
-	`log("TKLMutator_INFO: initializing TKLLogger");
-
-	Writer = TKLWriter;
-
-	if(FileName == "")
-	{
-		FileName = "KillLog.log";
-	}
-
-	Writer.OpenFile(FileName, FWFT_Log,, True, True);
-	Writer.Logf("--- KillLog Begin: " $ TimeStamp() $ " ---");
-}
-
-function Destroy()
-{
-	if (Writer != None)
-	{
-		Writer.Logf("--- KillLog End: " $ TimeStamp() $ " ---");
-		Writer.CloseFile();
-		Writer.Destroy();
-	}
 }

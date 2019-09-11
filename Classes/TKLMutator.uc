@@ -14,7 +14,7 @@ function PreBeginPlay()
     {
         `log("TKLMutator_INFO: team kill logging enabled");
         Writer = Spawn(class'FileWriter');
-        Logger.Initialize(TKLFileName, Writer);
+        OpenLogFile(TKLFileName);
     }
     super.PreBeginPlay();
 }
@@ -25,7 +25,7 @@ function ScoreKill(Controller Killer, Controller KilledPlayer)
     {
         if (Logger != None)
         {
-            Logger.LogIfTeamKill(Killer, KilledPlayer);
+            Logger.LogIfTeamKill(Killer, KilledPlayer, Writer, TimeStamp());
         }
         else
         {
@@ -35,11 +35,22 @@ function ScoreKill(Controller Killer, Controller KilledPlayer)
     super.ScoreKill(Killer, KilledPlayer);
 }
 
+function OpenLogFile(String FileName)
+{
+    if(FileName == "")
+    {
+        FileName = "KillLog.log";
+    }
+
+    Writer.OpenFile(FileName, FWFT_Log,, True, True);
+    Writer.Logf("--- KillLog Begin: " $ TimeStamp() $ " ---");
+}
+
 event Destroyed()
 {
-    Logger.Destroy();
     if (Writer != None)
     {
+        Writer.Logf("--- KillLog End: " $ TimeStamp() $ " ---");
         Writer.CloseFile();
         Writer.Destroy();
     }
