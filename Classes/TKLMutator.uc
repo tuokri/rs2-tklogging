@@ -21,7 +21,7 @@ function ScoreKill(Controller Killer, Controller KilledPlayer)
 
     if (bLogTeamKills)
     {
-        if (KilledPlayer != None)
+        if (KilledPlayer != None && KilledPlayer.Pawn != None)
         {
             Cause = GetItemName(string(
                 ROPawn(KilledPlayer.Pawn).LastTakeHitInfo.DamageType));
