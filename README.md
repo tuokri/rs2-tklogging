@@ -1,3 +1,5 @@
+## TEAM KILL LOGGING MUTATOR FOR RISING STORM 2: VIETNAM
+
 ### FUNCTIONALITY
 Log team kills in server logs for administrative purposes.
 
