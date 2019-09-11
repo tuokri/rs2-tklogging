@@ -12,7 +12,7 @@ Has no effect on normal player experience.
 ```?mutator=TKLMutator.TKLMutator```
 
 ### CONFIGURATION
-Can be enabled or disabled in 'ROGame_TKLMutator.ini' by setting bLogTeamKills to either True or False.
+Can be enabled or disabled in 'ROGame_TKLMutator.ini' by setting ```bLogTeamKills``` to either ```True``` or ```False```.
 
 (Might require map change or server restart).
 
