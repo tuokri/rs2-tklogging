@@ -86,13 +86,25 @@ function LogIfTeamKill(Controller Killer, Controller KilledPlayer)
     }
 }
 
-event Destroyed()
+function CloseWriter()
 {
     if (Writer != None)
     {
         Writer.Logf("--- KillLog End: " $ TimeStamp() $ " ---");
         Writer.CloseFile();
         Writer.Destroy();
+        Writer = None;
     }
+}
+
+function ModifyMatchWon(out byte out_WinningTeam, out byte out_WinCondition, optional out byte out_RoundWinningTeam)
+{
+    CloseWriter();
+    super.ModifyMatchWon(out_WinningTeam, out_WinCondition, out_RoundWinningTeam);
+}
+
+event Destroyed()
+{
+    CloseWriter();
     super.Destroyed();
 }
