@@ -21,10 +21,17 @@ var int             OutputQueueLen;
 // var int             InputQueueLen;
 
 var bool            bEOF;
+var bool            bAcceptNewData;
 
 // var string          CRLF;
 // var string          CR;
 // var string          LF;
+
+function PreBeginPlay()
+{
+    ResetBuffer();
+    super.PreBeginPlay();
+}
 
 final function ResetBuffer()
 {
@@ -38,6 +45,7 @@ final function ResetBuffer()
     // CR = Chr(13);
     // LF = Chr(10);
     bEOF = False;
+    bAcceptNewData = True;
     LinkMode = MODE_Line;
     ReceiveMode = RMODE_Manual;
 }
@@ -76,22 +84,22 @@ final function ResetBuffer()
 //     return Result;
 // }
 
-// final function bool SendEOF()
-// {
-//     local int NewTail;
+final function bool SendEOF()
+{
+    local int NewTail;
 
-//     NewTail = OutputBufferTail;
-//     NewTail = (NewTail + 1) % `TCP_BUFFER_SIZE;
-//     if (NewTail == OutputBufferHead)
-//     {
-//         `log("[BufferedTcpLink]: output buffer overrun");
-//         return False;
-//     }
-//     OutputBuffer[OutputBufferTail] = 0;
-//     OutputBufferTail = NewTail;
+    NewTail = OutputBufferTail;
+    NewTail = (NewTail + 1) % `TCP_BUFFER_SIZE;
+    if (NewTail == OutputBufferHead)
+    {
+        // `log("[BufferedTcpLink]: output buffer overrun");
+        return False;
+    }
+    OutputBuffer[OutputBufferTail] = 0;
+    OutputBufferTail = NewTail;
 
-//     return True;
-// }
+    return True;
+}
 
 // Read an individual character, returns 0 if no characters waiting.
 // final function int ReadChar()
@@ -153,6 +161,11 @@ function bool SendBufferedData(string Text)
     local int NewTail;
 
     // `log("Sending: " $ Text $ ".");
+
+    if (!bAcceptNewData)
+    {
+        return False;
+    }
 
     TextLen = Len(Text);
     for (i = 0; i < TextLen; i++)
@@ -248,6 +261,13 @@ final function DoBufferQueueIO()
     //         break;
     //     }
     // }
+}
+
+function bool Close()
+{
+    bAcceptNewData = False;
+    while (!SendEOF()) {}
+    return super.Close();
 }
 
 defaultproperties
