@@ -54,11 +54,19 @@ function PreBeginPlay()
                 `log("[TKLMutator]: error spawning TKLMutatorTcpLinkClient");
                 return;
             }
+
+            SetTimer(0.1, True, 'TestSend');
+
             bLinkEnabled = True;
         }
     }
 
     super.PreBeginPlay();
+}
+
+final function TestSend()
+{
+    TKLMTLC.SendBufferedData("this a test message........");
 }
 
 function ScoreKill(Controller Killer, Controller KilledPlayer)

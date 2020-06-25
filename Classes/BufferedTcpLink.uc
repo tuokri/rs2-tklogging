@@ -1,6 +1,6 @@
 //=============================================================================
-// BufferedTcpLink
-// Adapted from Unreal Engine 2 source code.
+// BufferedTcpLink: buffered outbound communication over TCP socket.
+// Adapted from Unreal Engine 2 source code by fluudah (tuokri on GitHub).
 // Copyright Epic Games, Inc. All Rights Reserved.
 //=============================================================================
 class BufferedTcpLink extends TcpLink;
@@ -22,9 +22,9 @@ var int             OutputQueueLen;
 
 var bool            bEOF;
 
-var string          CRLF;
-var string          CR;
-var string          LF;
+// var string          CRLF;
+// var string          CR;
+// var string          LF;
 
 final function ResetBuffer()
 {
@@ -34,64 +34,64 @@ final function ResetBuffer()
     // InputBufferTail = 0;
     OutputBufferHead = 0;
     OutputBufferTail = 0;
-    CRLF = Chr(10) $ Chr(13);
-    CR = Chr(13);
-    LF = Chr(10);
+    // CRLF = Chr(10) $ Chr(13);
+    // CR = Chr(13);
+    // LF = Chr(10);
     bEOF = False;
     LinkMode = MODE_Line;
     ReceiveMode = RMODE_Manual;
 }
 
-final function string ParseDelimited(string Text, string Delimiter, int Count, optional bool bToEndOfLine)
-{
-    local string Result;
-    local int Found, i;
-    local string s;
+// final function string ParseDelimited(string Text, string Delimiter, int Count, optional bool bToEndOfLine)
+// {
+//     local string Result;
+//     local int Found, i;
+//     local string s;
 
-    Result = "";
-    Found = 1;
+//     Result = "";
+//     Found = 1;
 
-    for (i = 0; i < Len(Text); i++)
-    {
-        s = Mid(Text, i, 1);
-        if (InStr(Delimiter, s) != -1)
-        {
-            if (Found == Count)
-            {
-                if (bToEndOfLine)
-                    return Result $ Mid(Text, i);
-                else
-                    return Result;
-            }
+//     for (i = 0; i < Len(Text); i++)
+//     {
+//         s = Mid(Text, i, 1);
+//         if (InStr(Delimiter, s) != -1)
+//         {
+//             if (Found == Count)
+//             {
+//                 if (bToEndOfLine)
+//                     return Result $ Mid(Text, i);
+//                 else
+//                     return Result;
+//             }
 
-            Found++;
-        }
-        else
-        {
-            if (Found >= Count)
-                Result = Result $ s;
-        }
-    }
+//             Found++;
+//         }
+//         else
+//         {
+//             if (Found >= Count)
+//                 Result = Result $ s;
+//         }
+//     }
 
-    return Result;
-}
+//     return Result;
+// }
 
-final function bool SendEOF()
-{
-    local int NewTail;
+// final function bool SendEOF()
+// {
+//     local int NewTail;
 
-    NewTail = OutputBufferTail;
-    NewTail = (NewTail + 1) % `TCP_BUFFER_SIZE;
-    if (NewTail == OutputBufferHead)
-    {
-        `log("[BufferedTcpLink]: output buffer overrun");
-        return False;
-    }
-    OutputBuffer[OutputBufferTail] = 0;
-    OutputBufferTail = NewTail;
+//     NewTail = OutputBufferTail;
+//     NewTail = (NewTail + 1) % `TCP_BUFFER_SIZE;
+//     if (NewTail == OutputBufferHead)
+//     {
+//         `log("[BufferedTcpLink]: output buffer overrun");
+//         return False;
+//     }
+//     OutputBuffer[OutputBufferTail] = 0;
+//     OutputBufferTail = NewTail;
 
-    return True;
-}
+//     return True;
+// }
 
 // Read an individual character, returns 0 if no characters waiting.
 // final function int ReadChar()
@@ -148,21 +148,20 @@ final function bool SendEOF()
 
 function bool SendBufferedData(string Text)
 {
-    local int intLength;
+    local int TextLen;
     local int i;
     local int NewTail;
 
-    // ``("Sending: " $ Text $ ".");
+    // `log("Sending: " $ Text $ ".");
 
-    intLength = Len(Text);
-
-    for (i=0; i<intLength; i++)
+    TextLen = Len(Text);
+    for (i = 0; i < TextLen; i++)
     {
         NewTail = OutputBufferTail;
         NewTail = (NewTail + 1) % `TCP_BUFFER_SIZE;
         if (NewTail == OutputBufferHead)
         {
-            `log("[BufferedTcpLink]: output buffer overrun");
+            // `log("[BufferedTcpLink]: output buffer overrun");
             return False;
         }
         OutputBuffer[OutputBufferTail] = Asc(Mid(Text, i, 1));
