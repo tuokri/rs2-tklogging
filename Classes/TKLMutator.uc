@@ -54,12 +54,18 @@ function PreBeginPlay()
                 `log("[TKLMutator]: error spawning TKLMutatorTcpLinkClient");
                 return;
             }
-
+            TKLMTLC.Parent = self;
             bLinkEnabled = True;
         }
     }
 
     super.PreBeginPlay();
+}
+
+function PostBeginPlay()
+{
+    SetCancelOpenLinkTimer();
+    super.PostBeginPlay();
 }
 
 function ScoreKill(Controller Killer, Controller KilledPlayer)
@@ -144,7 +150,7 @@ final function LogKill(Controller Killer, Controller KilledPlayer)
 
             Writer.Logf(LogRecord);
 
-            if (bLinkEnabled)
+            if (bLinkEnabled && TKLMTLC != None)
             {
                 TKLMTLC.SendBufferedData(LogRecord);
             }
@@ -173,6 +179,22 @@ final function CloseLink()
         TKLMTLC = None;
     }
 }
+
+// Stupid hack to avoid TKLMTLC.Open() from spamming logs if it fails.
+final function SetCancelOpenLinkTimer()
+{
+    SetTimer(2, False, 'CancelOpenLink');
+}
+
+final function CancelOpenLink()
+{
+    if (TKLMTLC != None && !TKLMTLC.IsConnected())
+    {
+        `log("[TKLMutator]: cancelling link connection attempt");
+        TKLMTLC.Close();
+    }
+}
+
 
 function ModifyMatchWon(out byte out_WinningTeam, out byte out_WinCondition, optional out byte out_RoundWinningTeam)
 {

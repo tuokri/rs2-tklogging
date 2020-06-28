@@ -9,6 +9,13 @@ var config string UniqueRS2ServerId;
 var int Retries;
 var bool bRetryOnClosed;
 
+// Must store reference to parent in order to start
+// Open() cancellation timer in case the Open() call fails.
+// When Open() call fails, it will block and spam log
+// with errors. Timers in this class will also not work
+// while the call to Open() is blocking.
+var TKLMutator Parent;
+
 final function ResolveServer()
 {
     `log("[TKLMutatorTcpLinkClient]: resolving: " $ TKLServerHost);
@@ -17,7 +24,6 @@ final function ResolveServer()
 
 event PostBeginPlay()
 {
-    Disable('Tick');
     super.PostBeginPlay();
 
     bRetryOnClosed = True;
@@ -57,7 +63,6 @@ event Resolved(IpAddr Addr)
     {
         `log("[TKLMutatorTcpLinkClient]: failed to open connection, retrying in 5 seconds");
         Retry();
-        return;
     }
 }
 
@@ -70,12 +75,10 @@ event ResolveFailed()
 event Opened()
 {
     `log("[TKLMutatorTcpLinkClient]: connection opened");
-    Enable('Tick');
 }
 
 event Closed()
 {
-    Disable('Tick');
     if (bRetryOnClosed)
     {
         `log("[TKLMutatorTcpLinkClient]: connection closed unexpectedly, retrying in 5 seconds");
@@ -106,6 +109,7 @@ function bool SendBufferedData(string Text)
 function Tick(float DeltaTime)
 {
     DoBufferQueueIO();
+    super.Tick(DeltaTime);
 }
 
 final function Retry()
@@ -113,10 +117,12 @@ final function Retry()
     if (Retries > MaxRetries)
     {
         `log("[TKLMutatorTcpLinkClient]: max retries exceeded (" $ MaxRetries $ ")");
+        Close();
         return;
     }
     Retries++;
     SetTimer(5, False, 'ResolveServer');
+    Parent.SetCancelOpenLinkTimer();
 }
 
 defaultproperties

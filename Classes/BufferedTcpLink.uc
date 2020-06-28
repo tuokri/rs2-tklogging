@@ -195,7 +195,7 @@ final function DoBufferQueueIO()
 
     if (IsConnected())
     {
-        // Output data
+        // Output data.
         OutputQueueLen = 0;
         OutputQueue = "";
         NewHead = OutputBufferHead;
@@ -265,8 +265,8 @@ final function DoBufferQueueIO()
 
 function bool Close()
 {
+    SendEOF();
     bAcceptNewData = False;
-    while (!SendEOF()) {}
     return super.Close();
 }
 
