@@ -195,20 +195,24 @@ final function CancelOpenLink()
     }
 }
 
+final function CleanUp()
+{
+    bEnabled = False;
+    CloseWriter();
+    CloseLink();
+}
 
+// TODO: for some reason this isn't being called.
 function ModifyMatchWon(out byte out_WinningTeam, out byte out_WinCondition, optional out byte out_RoundWinningTeam)
 {
     `log("[TKLMutator]: ModifyMatchWon()");
-    CloseWriter();
-    CloseLink();
+    CleanUp();
     super.ModifyMatchWon(out_WinningTeam, out_WinCondition, out_RoundWinningTeam);
 }
 
 event Destroyed()
 {
     `log("[TKLMutator]: Destroyed()");
-    bEnabled = False;
-    CloseWriter();
-    CloseLink();
+    CleanUp();
     super.Destroyed();
 }
