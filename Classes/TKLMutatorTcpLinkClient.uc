@@ -121,8 +121,8 @@ final function Retry()
         return;
     }
     Retries++;
-    SetTimer(5, False, 'ResolveServer');
-    Parent.SetCancelOpenLinkTimer();
+    SetTimer(5.0, False, 'ResolveServer');
+    Parent.SetCancelOpenLinkTimer(7.0);
 }
 
 defaultproperties

@@ -64,7 +64,7 @@ function PreBeginPlay()
 
 function PostBeginPlay()
 {
-    SetCancelOpenLinkTimer();
+    SetCancelOpenLinkTimer(2.0);
     super.PostBeginPlay();
 }
 
@@ -181,9 +181,9 @@ final function CloseLink()
 }
 
 // Stupid hack to avoid TKLMTLC.Open() from spamming logs if it fails.
-final function SetCancelOpenLinkTimer()
+final function SetCancelOpenLinkTimer(float Time)
 {
-    SetTimer(2, False, 'CancelOpenLink');
+    SetTimer(Time, False, 'CancelOpenLink');
 }
 
 final function CancelOpenLink()
