@@ -1,12 +1,16 @@
 ## TEAM KILL LOGGING MUTATOR FOR RISING STORM 2: VIETNAM
 
 ### FUNCTIONALITY
-Log team kills in server logs for administrative purposes.
+Log team kills (and optionally normal kills) in server logs for administrative purposes.
 
 Has no effect on normal player experience.
 
 ### EXAMPLE LOG ENTRY
-![alt text](https://i.ibb.co/X3JXKSq/tklog.png "Example log entry")
+![example log entry](https://i.ibb.co/X3JXKSq/tklog.png "Example log entry")
+
+## DISCORD WEBHOOK INTEGRATION
+Integrating kill logs with Discord by using webhooks is supported and
+requires [TKLServer](https://github.com/tuokri/tklserver).
 
 ### MUTATOR ARGUMENT FOR SERVER OPERATORS
 ```?mutator=TKLMutator.TKLMutator```
