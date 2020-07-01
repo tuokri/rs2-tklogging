@@ -1,6 +1,7 @@
 class TKLMutatorTcpLinkClient extends BufferedTcpLink
-    config(Game_TKLMutator);
+    config(Mutator_TKLMutator_Server);
 
+// See: https://github.com/tuokri/tklserver
 var config string TKLServerHost;
 var config int TKLServerPort;
 var config int MaxRetries;
@@ -15,6 +16,43 @@ var bool bRetryOnClosed;
 // with errors. Timers in this class will also not work
 // while the call to Open() is blocking.
 var TKLMutator Parent;
+
+static final function StaticFirstTimeConfig()
+{
+    if ((Len(default.TKLServerHost) == 0)
+        && (default.TKLServerPort == 0)
+        && (default.MaxRetries == 0)
+        && (Len(default.UniqueRS2ServerId) == 0))
+    {
+        `log("[TKLMutatorTcpLinkClient]: setting config values to first time defaults");
+        default.TKLServerHost = "localhost";
+        default.TKLServerPort = 8586;
+        default.MaxRetries = 5;
+        default.UniqueRS2ServerId = "0000";
+        StaticSaveConfig();
+    }
+}
+
+final function FirstTimeConfig()
+{
+    if ((Len(TKLServerHost) == 0)
+        && (TKLServerPort == 0)
+        && (MaxRetries == 0)
+        && (Len(UniqueRS2ServerId) == 0))
+    {
+        `log("[TKLMutatorTcpLinkClient]: setting config values to first time defaults");
+        TKLServerHost = "localhost";
+        TKLServerPort = 8586;
+        MaxRetries = 5;
+        UniqueRS2ServerId = "0000";
+    }
+}
+
+event PreBeginPlay()
+{
+    FirstTimeConfig();
+    SaveConfig();
+}
 
 final function ResolveServer()
 {
@@ -31,6 +69,7 @@ event PostBeginPlay()
     if (MaxRetries < 0)
     {
         MaxRetries = `MAX_RESOLVE_RETRIES;
+        `log("[TKLMutatorTcpLinkClient]: invalid MaxRetries, defaulting to: " $ `MAX_RESOLVE_RETRIES);
     }
 
     if (Len(UniqueRS2ServerId) != 4)

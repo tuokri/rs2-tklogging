@@ -1,5 +1,5 @@
 class TKLMutator extends ROMutator
-    config(Game_TKLMutator);
+    config(Mutator_TKLMutator_Server);
 
 var config bool bLogTeamKills;
 var config bool bLogKills;
@@ -15,8 +15,27 @@ var string KillAction;
 var FileWriter Writer;
 var TKLMutatorTcpLinkClient TKLMTLC;
 
+final function FirstTimeConfig()
+{
+    if ((!bLogTeamKills)
+        && (!bLogKills)
+        && (!bSendLogToServer)
+        && (Len(TKLFileName) == 0))
+    {
+        `log("[TKLMutator]: setting config values to first time defaults");
+        bLogTeamKills = True;
+        bLogKills = False;
+        bSendLogToServer = False;
+        TKLFileName = "KillLog";
+        class'TKLMutatorTcpLinkClient'.static.StaticFirstTimeConfig();
+    }
+}
+
 function PreBeginPlay()
 {
+    FirstTimeConfig();
+    SaveConfig();
+
     `log("[TKLMutator]: initializing TKLMutator");
 
     if (bLogTeamKills)
@@ -47,6 +66,8 @@ function PreBeginPlay()
 
         if (bSendLogToServer)
         {
+            `log("[TKLMutator]: log sending to TKLServer is enabled, "
+                $ "attempting to spawn TKLMutatorTcpLinkClient");
             TKLMTLC = Spawn(class'TKLMutatorTcpLinkClient');
             if (TKLMTLC == None)
             {
@@ -56,6 +77,7 @@ function PreBeginPlay()
             }
             TKLMTLC.Parent = self;
             bLinkEnabled = True;
+            `log("[TKLMutator]: TKLMutatorTcpLinkClient initialized");
         }
     }
 
@@ -81,7 +103,7 @@ final function OpenLogFile(string FileName)
 {
     if(FileName == "")
     {
-        FileName = "KillLog.log";
+        FileName = "KillLog";
     }
 
     Writer.OpenFile(FileName, FWFT_Log,, True, True);
@@ -215,4 +237,8 @@ event Destroyed()
     `log("[TKLMutator]: Destroyed()");
     CleanUp();
     super.Destroyed();
+}
+
+defaultproperties
+{
 }
