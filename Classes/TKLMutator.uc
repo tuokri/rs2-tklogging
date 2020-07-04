@@ -187,7 +187,6 @@ final function CloseWriter()
         Writer.Logf("--- KillLog End: " $ TimeStamp() $ " ---");
         Writer.CloseFile();
         Writer.Destroy();
-        Writer = None;
     }
 }
 
@@ -198,7 +197,6 @@ final function CloseLink()
         bLinkEnabled = False;
         TKLMTLC.Close();
         TKLMTLC.Destroy();
-        TKLMTLC = None;
     }
 }
 
@@ -224,13 +222,12 @@ final function CleanUp()
     CloseLink();
 }
 
-// TODO: for some reason this isn't being called.
-function ModifyMatchWon(out byte out_WinningTeam, out byte out_WinCondition, optional out byte out_RoundWinningTeam)
-{
-    `log("[TKLMutator]: ModifyMatchWon()");
-    CleanUp();
-    super.ModifyMatchWon(out_WinningTeam, out_WinCondition, out_RoundWinningTeam);
-}
+// function ModifyMatchWon(out byte out_WinningTeam, out byte out_WinCondition, optional out byte out_RoundWinningTeam)
+// {
+//     `log("[TKLMutator]: ModifyMatchWon()");
+//     CleanUp();
+//     super.ModifyMatchWon(out_WinningTeam, out_WinCondition, out_RoundWinningTeam);
+// }
 
 event Destroyed()
 {

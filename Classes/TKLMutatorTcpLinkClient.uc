@@ -52,6 +52,7 @@ event PreBeginPlay()
 {
     FirstTimeConfig();
     SaveConfig();
+    super.PreBeginPlay();
 }
 
 final function ResolveServer()
@@ -79,6 +80,8 @@ event PostBeginPlay()
     }
 
     ResolveServer();
+
+    super.PostBeginPlay();
 }
 
 event Resolved(IpAddr Addr)
@@ -114,6 +117,7 @@ event ResolveFailed()
 event Opened()
 {
     `log("[TKLMutatorTcpLinkClient]: connection opened");
+    bAcceptNewData = True;
 }
 
 event Closed()
@@ -126,6 +130,7 @@ event Closed()
     else
     {
         `log("[TKLMutatorTcpLinkClient]: connection closed");
+        bAcceptNewData = False;
     }
 }
 
@@ -141,7 +146,7 @@ function bool SendBufferedData(string Text)
     // {
     //     `log("[TKLMutatorTcpLinkClient]: attempting to queue data but connection is not open");
     // }
-    Text = UniqueRS2ServerId $ Text;
+    Text = UniqueRS2ServerId $ Text $ LF;
     return super.SendBufferedData(Text);
 }
 

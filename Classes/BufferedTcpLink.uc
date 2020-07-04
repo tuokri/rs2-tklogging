@@ -20,12 +20,12 @@ var int             OutputQueueLen;
 // var string          InputQueue;
 // var int             InputQueueLen;
 
-var bool            bEOF;
+// var bool            bEOF;
 var bool            bAcceptNewData;
 
 // var string          CRLF;
 // var string          CR;
-// var string          LF;
+var string          LF;
 
 function PreBeginPlay()
 {
@@ -43,10 +43,10 @@ final function ResetBuffer()
     OutputBufferTail = 0;
     // CRLF = Chr(10) $ Chr(13);
     // CR = Chr(13);
-    // LF = Chr(10);
-    bEOF = False;
+    LF = Chr(10);
+    // bEOF = False;
     bAcceptNewData = True;
-    LinkMode = MODE_Line;
+    LinkMode = Mode_Text;
     ReceiveMode = RMODE_Manual;
 }
 
@@ -92,7 +92,7 @@ final function bool SendEOF()
     NewTail = (NewTail + 1) % `TCP_BUFFER_SIZE;
     if (NewTail == OutputBufferHead)
     {
-        // `log("[BufferedTcpLink]: output buffer overrun");
+        `log("[BufferedTcpLink]: output buffer overrun");
         return False;
     }
     OutputBuffer[OutputBufferTail] = 0;
@@ -174,7 +174,7 @@ function bool SendBufferedData(string Text)
         NewTail = (NewTail + 1) % `TCP_BUFFER_SIZE;
         if (NewTail == OutputBufferHead)
         {
-            // `log("[BufferedTcpLink]: output buffer overrun");
+            `log("[BufferedTcpLink]: output buffer overrun");
             return False;
         }
         OutputBuffer[OutputBufferTail] = Asc(Mid(Text, i, 1));
@@ -195,30 +195,20 @@ final function DoBufferQueueIO()
 
     if (IsConnected())
     {
-        // Output data.
         OutputQueueLen = 0;
         OutputQueue = "";
         NewHead = OutputBufferHead;
         while ((OutputQueueLen < 255) && (NewHead != OutputBufferTail))
         {
-            // Put some more stuff in the output queue.
-            if (OutputBuffer[NewHead] != 0)
-            {
-                OutputQueue = OutputQueue $ Chr(OutputBuffer[NewHead]);
-                OutputQueueLen++;
-            }
-            else
-            {
-                bEOF = True;
-            }
-
+            OutputQueue = OutputQueue $ Chr(OutputBuffer[NewHead]);
+            OutputQueueLen++;
             NewHead = (NewHead + 1) % `TCP_BUFFER_SIZE;
         }
 
         if (OutputQueueLen > 0)
         {
-            // BytesSent = SendText(OutputQueue $ "");
-            SendText(OutputQueue $ "");
+            // BytesSent = SendText(OutputQueue);
+            SendText(OutputQueue);
             OutputBufferHead = NewHead; // (OutputBufferHead + BytesSent) % `TCP_BUFFER_SIZE;
             // `log("Sent " $ BytesSent $ " bytes >>" $ OutputQueue $ "<<");
         }
