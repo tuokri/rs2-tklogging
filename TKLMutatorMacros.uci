@@ -1,2 +1,2 @@
-`define TCP_BUFFER_SIZE			2048
-`define MAX_RESOLVE_RETRIES		5
+`define TCP_BUFFER_SIZE         2048  // Ring buffer size for outbound data.
+`define MAX_RESOLVE_RETRIES     5     // Max number of URL resolve retries before.

@@ -1,5 +1,5 @@
 //=============================================================================
-// BufferedTcpLink: buffered outbound communication over TCP socket.
+// BufferedTcpLink: ring-buffered outbound communication over TCP socket.
 // Adapted from Unreal Engine 2 source code by fluudah (tuokri on GitHub).
 // Copyright Epic Games, Inc. All Rights Reserved.
 //=============================================================================
@@ -113,7 +113,6 @@ final function bool SendEOF()
 //     return c;
 // }
 
-
 // Take a look at the next waiting character, return 0 if no characters waiting.
 // final function int PeekChar()
 // {
@@ -190,17 +189,18 @@ final function DoBufferQueueIO()
     // local int i;
     // local int NewTail;
     local int NewHead;
-    // local int BytesSent;
     // local byte ch;
+
+    // local int BytesSent;
 
     if (IsConnected())
     {
         OutputQueueLen = 0;
         OutputQueue = "";
         NewHead = OutputBufferHead;
-        while ((OutputQueueLen < 255) && (NewHead != OutputBufferTail))
+        while ((OutputQueueLen < `TCP_BUFFER_SIZE) && (NewHead != OutputBufferTail))
         {
-            OutputQueue = OutputQueue $ Chr(OutputBuffer[NewHead]);
+            OutputQueue $= Chr(OutputBuffer[NewHead]);
             OutputQueueLen++;
             NewHead = (NewHead + 1) % `TCP_BUFFER_SIZE;
         }

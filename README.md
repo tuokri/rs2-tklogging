@@ -1,27 +1,26 @@
-## TEAM KILL LOGGING MUTATOR FOR RISING STORM 2: VIETNAM
+## Team Kill Logging Mutator for Rising Storm 2: Vietnam
 
-### FUNCTIONALITY
-Log team kills (and optionally normal kills) in server logs for administrative purposes.
+### Features
+- Logs team kills (and optionally normal kills) in server logs for administrative purposes.
+- (Team) kill log forwarding to a Discord text channel.
+- Has no effect on normal player experience.
 
-Has no effect on normal player experience.
-
-### EXAMPLE LOG ENTRY
+### Kill log examples
 ![example log entry](https://i.ibb.co/X3JXKSq/tklog.png "Example log entry")
 
-## DISCORD WEBHOOK INTEGRATION
+## Discord Webhook integration
 Integrating kill logs with Discord by using webhooks is supported and
 requires [TKLServer](https://github.com/tuokri/tklserver).
 
-### MUTATOR ARGUMENT FOR SERVER OPERATORS
+### Mutator argument for server operators
 ```?mutator=TKLMutator.TKLMutator```
 
-### CONFIGURATION
+### Configuration
 Team kill logging can be enabled or disabled in 'ROGame_TKLMutator.ini' by setting ```bLogTeamKills``` to either ```True``` or ```False```.
 Team kill log files are of format 'FILENAME-DATE.log', where FILENAME can be set by ```TKLFileName``` in the configuration file.
 
 Changing configuration might require map change or server restart.
 
-### STEAM WORKSHOP
+### Steam Workshop
 https://steamcommunity.com/sharedfiles/filedetails/?id=1858859776
 
-Currently pending mod whitelisting by TWI.

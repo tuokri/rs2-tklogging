@@ -8,12 +8,28 @@ var config string TKLFileName;
 
 var bool bEnabled;
 var bool bLinkEnabled;
-var string LogRecord;
 var string Cause;
 var string TeamKillAction;
 var string KillAction;
 var FileWriter Writer;
 var TKLMutatorTcpLinkClient TKLMTLC;
+
+var string FileRecord; // Written to file on disk.
+// var string NetRecord; // Compressed log record sent over network.
+
+struct KillLogRecord
+{
+    var string TimeStamp;
+    var string KillerName;
+    var string VictimName;
+    var string KillerID;
+    var string VictimID;
+    var string Action;
+    var string Cause;
+};
+
+var KillLogRecord LogRecord;
+var array<KillLogRecord> RecordQueue;
 
 final function FirstTimeConfig()
 {
@@ -79,6 +95,8 @@ function PreBeginPlay()
             bLinkEnabled = True;
             `log("[TKLMutator]: TKLMutatorTcpLinkClient initialized");
         }
+
+        SetTimer(0.1, True, 'ProcessQueue');
     }
 
     super.PreBeginPlay();
@@ -110,27 +128,25 @@ final function OpenLogFile(string FileName)
     Writer.Logf("--- KillLog Begin: " $ TimeStamp() $ " ---");
 }
 
-final function string LastHitDamageType(Controller KilledPlayer)
+final function string LastHitDamageType(Controller C)
 {
-    if (KilledPlayer.Pawn == None)
+    if (C.Pawn == None)
     {
         return "UNKNOWN_CAUSE";
     }
-    return string(ROPawn(KilledPlayer.Pawn).LastTakeHitInfo.DamageType);
+    return string(ROPawn(C.Pawn).LastTakeHitInfo.DamageType);
 }
 
-final function LogKill(Controller Killer, Controller KilledPlayer)
+final function LogKill(Controller Killer, Controller Victim)
 {
-    local string KillerSteamId64Hex;
-    local string KilledPlayerSteamId64Hex;
     local string LastHitDamageTypeStr;
     local string Action;
 
-    if (Killer != None && KilledPlayer != None)
+    if (Killer != None && Victim != None)
     {
-        if (Killer.PlayerReplicationInfo != None && KilledPlayer.PlayerReplicationInfo != None)
+        if (Killer.PlayerReplicationInfo != None && Victim.PlayerReplicationInfo != None)
         {
-            if (Killer.GetTeamNum() == KilledPlayer.GetTeamNum())
+            if (Killer.GetTeamNum() == Victim.GetTeamNum())
             {
                 if (!bLogTeamKills)
                 {
@@ -147,9 +163,9 @@ final function LogKill(Controller Killer, Controller KilledPlayer)
                 Action = KillAction;
             }
 
-            LastHitDamageTypeStr = LastHitDamageType(KilledPlayer);
+            LastHitDamageTypeStr = LastHitDamageType(Victim);
 
-            if (KilledPlayer == Killer)
+            if (Victim == Killer)
             {
                 Cause = "SUICIDE_" $ LastHitDamageTypeStr;
             }
@@ -158,24 +174,15 @@ final function LogKill(Controller Killer, Controller KilledPlayer)
                 Cause = LastHitDamageTypeStr;
             }
 
-            KillerSteamId64Hex = class'OnlineSubsystem'.static.UniqueNetIdToString(
-                Killer.PlayerReplicationInfo.UniqueId);
-            KilledPlayerSteamId64Hex = class'OnlineSubsystem'.static.UniqueNetIdToString(
-                KilledPlayer.PlayerReplicationInfo.UniqueId);
+            LogRecord.TimeStamp = TimeStamp();
+            LogRecord.KillerName = Killer.PlayerReplicationInfo.PlayerName;
+            LogRecord.VictimName = Victim.PlayerReplicationInfo.PlayerName;
+            LogRecord.KillerID = class'OnlineSubsystem'.static.UniqueNetIdToString(Killer.PlayerReplicationInfo.UniqueId);
+            LogRecord.VictimID = class'OnlineSubsystem'.static.UniqueNetIdToString(Victim.PlayerReplicationInfo.UniqueId);
+            LogRecord.Action = Action;
+            LogRecord.Cause = Cause;
 
-            LogRecord = "(" $ TimeStamp() $ ")";
-            LogRecord $= " '" $ Killer.PlayerReplicationInfo.PlayerName;
-            LogRecord $= "' [" $ KillerSteamId64Hex $ "]";
-            LogRecord $= " " $ Action $ " '" $ KilledPlayer.PlayerReplicationInfo.PlayerName;
-            LogRecord $= "' [" $ KilledPlayerSteamId64Hex $ "]";
-            LogRecord $= " with " $ "<" $ Cause $ ">";
-
-            Writer.Logf(LogRecord);
-
-            if (bLinkEnabled && TKLMTLC != None)
-            {
-                TKLMTLC.SendBufferedData(LogRecord);
-            }
+            RecordQueue.AddItem(LogRecord);
         }
     }
 }
@@ -229,6 +236,56 @@ final function CleanUp()
 //     super.ModifyMatchWon(out_WinningTeam, out_WinCondition, out_RoundWinningTeam);
 // }
 
+// Simple "compression" for network log records.
+/*
+final function string Compress(String Str)
+{
+    local string NetRecord;
+
+    NetRecord = "(" $ Record.TimeStamp $ ")";
+    NetRecord $= " '" $ Record.KillerName;
+    NetRecord $= "' [" $ Record.KillerID $ "]";
+    NetRecord $= " " $ Left(Record.Action, 1) $ " '" $ Record.VictimName;
+    NetRecord $= "' [" $ Record.VictimID $ "]";
+    NetRecord $= " with " $ "<" $ Record.Cause $ ">";
+
+    return NetRecord;
+}
+*/
+
+final function ProcessQueue()
+{
+    local int NumProcessed;
+    local KillLogRecord Record;
+
+    if (RecordQueue.Length == 0)
+    {
+        return;
+    }
+
+    foreach RecordQueue(Record)
+    {
+        FileRecord = "(" $ Record.TimeStamp $ ")";
+        FileRecord $= " '" $ Record.KillerName;
+        FileRecord $= "' [" $ Record.KillerID $ "]";
+        FileRecord $= " " $ Record.Action $ " '" $ Record.VictimName;
+        FileRecord $= "' [" $ Record.VictimID $ "]";
+        FileRecord $= " with " $ "<" $ Record.Cause $ ">";
+
+        Writer.Logf(FileRecord);
+
+        if (bLinkEnabled && TKLMTLC != None)
+        {
+            // NetRecord = Compress(Record);
+            TKLMTLC.SendBufferedData(FileRecord);
+        }
+
+        NumProcessed++;
+    }
+
+    RecordQueue.Remove(0, NumProcessed);
+}
+
 event Destroyed()
 {
     `log("[TKLMutator]: Destroyed()");
@@ -238,4 +295,5 @@ event Destroyed()
 
 defaultproperties
 {
+    TickGroup=TG_DuringAsyncWork
 }
